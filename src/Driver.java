@@ -17,7 +17,7 @@ public class Driver {
     }
 
     private static void printResults(long[] results, String name, int trials) {
-        System.out.format("%15s %15d %15f ms\n", name,
+        System.out.format("%15s %15d %15f\n", name,
                 results[1] / trials, (float) results[0] / trials / 1000000);
     }
 
@@ -91,6 +91,7 @@ public class Driver {
             ppAnnealing = add(ppAnnealing, testFunction(() -> KarmarkarKarp.annealing(test, true)));
         }
 
+        System.out.format("%15s %15s %15s\n\n", "Strategy", "Avg. residue", "Avg. time (ms)");
         printResults(pure, "Pure", trials);
         printResults(random, "Random", trials);
         printResults(hill, "Hill", trials);
