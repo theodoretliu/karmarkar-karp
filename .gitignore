@@ -1,3 +1,5 @@
 .idea
 kk.iml
 out
+*.class
+.DS_store
