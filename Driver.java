@@ -74,7 +74,7 @@ public class Driver {
         long[] ppHill = new long[2];
         long[] ppAnnealing = new long[2];
 
-        int trials = 10;
+        int trials = 100;
         for (int i = 0; i < trials; i++) {
             long[] test = new long[100];
 
