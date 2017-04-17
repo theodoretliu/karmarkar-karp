@@ -2,15 +2,15 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.LongSupplier;
 
 public class Driver {
-    private static long[] testFunction(LongSupplier func) {
+    private static long[] testFunction(Callable<Long> func) throws Exception {
         long time1;
         long time2;
         time1 = System.nanoTime();
-        long result = func.getAsLong();
+        long result = func.call();
         time2 = System.nanoTime();
 
         return new long[] {time2 - time1, result};
@@ -76,19 +76,47 @@ public class Driver {
 
         int trials = 100;
         for (int i = 0; i < trials; i++) {
-            long[] test = new long[100];
+            final long[] test = new long[100];
 
             for (int j = 0; j < 100; j++) {
                 test[j] = ThreadLocalRandom.current().nextLong(1, 1000000000001L);
             }
 
-            pure = add(pure, testFunction(() -> KarmarkarKarp.pure(test)));
-            random = add(random, testFunction(() -> KarmarkarKarp.random(test, false)));
-            hill = add(hill, testFunction(() -> KarmarkarKarp.hill(test, false)));
-            annealing = add(annealing, testFunction(() -> KarmarkarKarp.annealing(test, false)));
-            ppRandom = add(ppRandom, testFunction(() -> KarmarkarKarp.random(test, true)));
-            ppHill = add(ppHill, testFunction(() -> KarmarkarKarp.hill(test, true)));
-            ppAnnealing = add(ppAnnealing, testFunction(() -> KarmarkarKarp.annealing(test, true)));
+            pure = add(pure, testFunction(new Callable<Long>() {
+                public Long call() {
+                    return KarmarkarKarp.pure(test);
+                }
+            }));
+            random = add(random, testFunction(new Callable<Long>() {
+                public Long call() {
+                    return KarmarkarKarp.random(test, false);
+                }
+            }));
+            hill = add(hill, testFunction(new Callable<Long>() {
+                public Long call() {
+                    return KarmarkarKarp.hill(test, false);
+                }
+            }));
+            annealing = add(annealing, testFunction(new Callable<Long>() {
+                public Long call() {
+                    return KarmarkarKarp.annealing(test, false);
+                }
+            }));
+            ppRandom = add(ppRandom, testFunction(new Callable<Long>() {
+                public Long call() {
+                    return KarmarkarKarp.random(test, true);
+                }
+            }));
+            ppHill = add(ppHill, testFunction(new Callable<Long>() {
+                public Long call() {
+                    return KarmarkarKarp.hill(test, true);
+                }
+            }));
+            ppAnnealing = add(ppAnnealing, testFunction(new Callable<Long>() {
+                public Long call() {
+                    return KarmarkarKarp.annealing(test, true);
+                }
+            }));
         }
 
         System.out.format("%15s %15s %15s\n\n", "Strategy", "Avg. residue", "Avg. time (ms)");
