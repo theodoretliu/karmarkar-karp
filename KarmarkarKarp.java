@@ -101,55 +101,76 @@ class KarmarkarKarp {
         int n = a.length;
 
         int[] s = randomSolution(n, pp);
+        long sResidue = residue(s, a, pp);
 
         for (int j = 0; j < MAX_ITERS; j++) {
             int[] sPrime = randomSolution(n, pp);
+            long sPrimeResidue = residue(sPrime, a, pp);
 
-            if (residue(sPrime, a, pp) < residue(s, a, pp))
+            if (sPrimeResidue < sResidue) {
                 s = sPrime;
+                sResidue = sPrimeResidue;
+            }
         }
 
-        return residue(s, a, pp);
+        return sResidue;
     }
 
     static long hill(long[] a, boolean pp) {
         int n = a.length;
         int[] s = randomSolution(n, pp);
+        long sResidue = residue(s, a, pp);
 
         for (int k = 0; k < MAX_ITERS; k++) {
             int[] sPrime = randomNeighbor(s, pp);
+            long sPrimeResidue = residue(sPrime, a, pp);
 
-            if (residue(sPrime, a, pp) < residue(s, a, pp))
+            if (sPrimeResidue < sResidue) {
                 s = sPrime;
+                sResidue = sPrimeResidue;
+            }
         }
 
-        return residue(s, a, pp);
+        return sResidue;
     }
 
     private static double temperature(int iter) {
         return 10000000000L * Math.pow(0.8, iter / 300);
     }
 
+    private static double t(int iter) {
+        return 1000000000000L * Math.exp(-iter / 7000.0);
+    }
+
     static long annealing(long[] a, boolean pp) {
         Random r = new Random();
         int n = a.length;
         int[] s = randomSolution(n, pp);
-        int[] best = s;
+        // int[] best = s;
+
+        long sResidue = residue(s, a, pp);
+        long bestResidue = sResidue;
         for (int i = 0; i < MAX_ITERS; i++) {
             int[] sPrime = randomNeighbor(s, pp);
 
-            if (residue(sPrime, a, pp) < residue(s, a, pp))
+            long sPrimeResidue = residue(sPrime, a, pp);
+
+            if (sPrimeResidue < sResidue) {
                 s = sPrime;
-            else {
-                if (r.nextFloat() < Math.exp(-(residue(sPrime, a, pp) - residue(s, a, pp))
-                        / temperature(i)))
+                sResidue = sPrimeResidue;
+            } else {
+                if (r.nextFloat() < Math.exp(-(sPrimeResidue - sResidue) / t(i))) {
                     s = sPrime;
+                    sResidue = sPrimeResidue;
+                }
             }
 
-            if (residue(s, a, pp) < residue(best, a, pp))
-                best = s;
+            if (sResidue < bestResidue) {
+                // best = s;
+                bestResidue = sResidue;
+            }
         }
 
-        return residue(best, a, pp);
+        return bestResidue;
     }
 }
