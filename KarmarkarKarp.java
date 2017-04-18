@@ -139,7 +139,7 @@ class KarmarkarKarp {
     }
 
     private static double t(int iter) {
-        return 1000000000000L * Math.exp(-iter / 7000.0);
+        return 10000000000L * Math.pow(0.93, iter / 300);
     }
 
     static long annealing(long[] a, boolean pp) {
@@ -159,7 +159,7 @@ class KarmarkarKarp {
                 s = sPrime;
                 sResidue = sPrimeResidue;
             } else {
-                if (r.nextFloat() < Math.exp(-(sPrimeResidue - sResidue) / t(i))) {
+                if (r.nextFloat() < Math.exp(-(sPrimeResidue - sResidue) / temperature(i))) {
                     s = sPrime;
                     sResidue = sPrimeResidue;
                 }

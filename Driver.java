@@ -16,9 +16,8 @@ public class Driver {
         return new long[] {time2 - time1, result};
     }
 
-    private static void printResults(long[] results, String name, int trials) {
-        System.out.format("%15s %15d %15f\n", name,
-                results[1] / trials, (float) results[0] / trials / 1000000);
+    private static void printResults(String name, long residue, double time) {
+        System.out.format("%15s %15d %15f\n", name, residue, time);
     }
 
     private static long[] add(long[] a, long[] b) throws Exception{
@@ -31,6 +30,15 @@ public class Driver {
             c[i] = a[i] + b[i];
 
         return c;
+    }
+
+    private static long sum(long[] a) {
+        long sum = 0;
+
+        for (long i : a)
+            sum += i;
+
+        return sum;
     }
 
     public static void main(String[] args) throws Exception {
@@ -66,15 +74,17 @@ public class Driver {
         // adopt the convention where the 0th index is the timing and the 1st index is the
         // results
 
-        long[] pure = new long[2];
-        long[] random = new long[2];
-        long[] hill = new long[2];
-        long[] annealing = new long[2];
-        long[] ppRandom = new long[2];
-        long[] ppHill = new long[2];
-        long[] ppAnnealing = new long[2];
-
         int trials = 100;
+
+        long[][] pure = new long[2][trials];
+        long[][] random = new long[2][trials];
+        long[][] hill = new long[2][trials];
+        long[][] annealing = new long[2][trials];
+        long[][] ppRandom = new long[2][trials];
+        long[][] ppHill = new long[2][trials];
+        long[][] ppAnnealing = new long[2][trials];
+
+
         for (int i = 0; i < trials; i++) {
             final long[] test = new long[100];
 
@@ -82,50 +92,99 @@ public class Driver {
                 test[j] = ThreadLocalRandom.current().nextLong(1, 1000000000001L);
             }
 
-            pure = add(pure, testFunction(new Callable<Long>() {
+            long[] temp = testFunction(new Callable<Long>() {
                 public Long call() {
                     return KarmarkarKarp.pure(test);
                 }
-            }));
-            random = add(random, testFunction(new Callable<Long>() {
+            });
+
+            pure[0][i] = temp[0];
+            pure[1][i] = temp[1];
+
+            temp = testFunction(new Callable<Long>() {
                 public Long call() {
                     return KarmarkarKarp.random(test, false);
                 }
-            }));
-            hill = add(hill, testFunction(new Callable<Long>() {
+            });
+
+            random[0][i] = temp[0];
+            random[1][i] = temp[1];
+
+            temp = testFunction(new Callable<Long>() {
                 public Long call() {
                     return KarmarkarKarp.hill(test, false);
                 }
-            }));
-            annealing = add(annealing, testFunction(new Callable<Long>() {
+            });
+
+            hill[0][i] = temp[0];
+            hill[1][i] = temp[1];
+
+            temp = testFunction(new Callable<Long>() {
                 public Long call() {
                     return KarmarkarKarp.annealing(test, false);
                 }
-            }));
-            ppRandom = add(ppRandom, testFunction(new Callable<Long>() {
+            });
+
+            annealing[0][i] = temp[0];
+            annealing[1][i] = temp[1];
+
+            temp = testFunction(new Callable<Long>() {
                 public Long call() {
                     return KarmarkarKarp.random(test, true);
                 }
-            }));
-            ppHill = add(ppHill, testFunction(new Callable<Long>() {
+            });
+
+            ppRandom[0][i] = temp[0];
+            ppRandom[1][i] = temp[1];
+
+            temp = testFunction(new Callable<Long>() {
                 public Long call() {
                     return KarmarkarKarp.hill(test, true);
                 }
-            }));
-            ppAnnealing = add(ppAnnealing, testFunction(new Callable<Long>() {
+            });
+
+            ppHill[0][i] = temp[0];
+            ppHill[1][i] = temp[1];
+
+            temp = testFunction(new Callable<Long>() {
                 public Long call() {
                     return KarmarkarKarp.annealing(test, true);
                 }
-            }));
+            });
+
+            ppAnnealing[0][i] = temp[0];
+            ppAnnealing[1][i] = temp[1];
         }
 
+        for (int i = 0; i < trials; i++)
+            System.out.println(pure[1][i]);
+        for (int i = 0; i < trials; i++)
+            System.out.println(random[1][i]);
+        for (int i = 0; i < trials; i++)
+            System.out.println(hill[1][i]);
+        for (int i = 0; i < trials; i++)
+            System.out.println(annealing[1][i]);
+        for (int i = 0; i < trials; i++)
+            System.out.println(ppRandom[1][i]);
+        for (int i = 0; i < trials; i++)
+            System.out.println(ppHill[1][i]);
+        for (int i = 0; i < trials; i++)
+            System.out.println(ppAnnealing[1][i]);
+
         System.out.format("%15s %15s %15s\n\n", "Strategy", "Avg. residue", "Avg. time (ms)");
-        printResults(pure, "Pure", trials);
-        printResults(random, "Random", trials);
-        printResults(hill, "Hill", trials);
-        printResults(annealing, "Annealing", trials);
-        printResults(ppRandom, "PP-Random", trials);
-        printResults(ppHill, "PP-Hill", trials);
-        printResults(ppAnnealing, "PP-Annealing", trials);
+        printResults("Pure", sum(pure[1]) / trials,
+                (double) sum(pure[0]) / trials / 1000000);
+        printResults("Random", sum(random[1]) / trials,
+                (double) sum(random[0]) / trials / 1000000);
+        printResults("Hill", sum(hill[1]) / trials,
+                (double) sum(hill[0]) / trials / 1000000);
+        printResults("Annealing", sum(annealing[1]) / trials,
+                (double) sum(annealing[0]) / trials / 1000000);
+        printResults("PP-Random", sum(ppRandom[1]) / trials,
+                (double) sum(ppRandom[0]) / trials / 1000000);
+        printResults("PP-Hill", sum(ppHill[1]) / trials,
+                (double) sum(ppHill[0]) / trials / 1000000);
+        printResults("PP-Annealing", sum(ppAnnealing[1]) / trials,
+                (double) sum(ppAnnealing[0]) / trials / 1000000);
     }
 }
