@@ -162,7 +162,7 @@ class KarmarkarKarp {
             } else {
                 if (r.nextFloat() < Math.exp(-(sPrimeResidue - sResidue) / temperature(i))) {
                     s = sPrime;
-                    sResidue = sPrimeResidue;g
+                    sResidue = sPrimeResidue;
                 }
             }
 

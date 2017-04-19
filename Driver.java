@@ -42,7 +42,7 @@ public class Driver {
     }
 
     public static void main(String[] args) throws Exception {
-        if (args.length == 1 && Integer.parseInt(args[0]) == 1) {
+        if (args.length == 2 && Integer.parseInt(args[0]) == 1) {
             int trials = 100;
             long[] bbResults = new long[2];
             for (int i = 0; i < trials; i++) {
