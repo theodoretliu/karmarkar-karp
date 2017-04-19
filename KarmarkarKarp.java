@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Random;
 
 class KarmarkarKarp {
@@ -139,7 +140,7 @@ class KarmarkarKarp {
     }
 
     private static double t(int iter) {
-        return 10000000000L * Math.pow(0.93, iter / 300);
+        return 10000000000L * Math.exp(iter / 3106.674673);
     }
 
     static long annealing(long[] a, boolean pp) {
@@ -161,7 +162,7 @@ class KarmarkarKarp {
             } else {
                 if (r.nextFloat() < Math.exp(-(sPrimeResidue - sResidue) / temperature(i))) {
                     s = sPrime;
-                    sResidue = sPrimeResidue;
+                    sResidue = sPrimeResidue;g
                 }
             }
 
@@ -169,6 +170,74 @@ class KarmarkarKarp {
                 // best = s;
                 bestResidue = sResidue;
             }
+        }
+
+        return bestResidue;
+    }
+
+    static long bubbleSearch(long[] a) {
+        Heap h = new Heap(a);
+        Random r = new Random();
+
+        while (h.size() > 10) {
+            int size = h.size();
+
+            int i = 0;
+
+            while (r.nextFloat() > 0.5)
+                i += 1;
+
+            int j = i + 1;
+
+            while (r.nextFloat() > 0.5)
+                j += 1;
+
+            i %= size;
+            j %= size;
+
+            if (i == j)
+                j = (j + 1) % size;
+
+            ArrayList<Long> temp = new ArrayList<>();
+            for (int x = 0; x <= Math.max(i, j); x++)
+                temp.add(h.extractMax());
+
+            long first = temp.get(i);
+            long second = temp.get(j);
+
+            temp.remove(Math.max(i, j));
+            temp.remove(Math.min(i, j));
+
+            h.insert(Math.abs(first - second));
+            for (long x : temp)
+                h.insert(x);
+        }
+
+        int size = h.size();
+        long bestResidue = Long.MAX_VALUE;
+        int limit = (int) Math.pow(2, size);
+        long[] values = new long[size];
+
+        for (int i = 0; i < values.length; i++) {
+            values[i] = h.extractMax();
+        }
+
+        for (int i = 0; i < limit; i++) {
+            int t = i;
+            int[] s = new int[size];
+            for (int j = 0; j < size; j++) {
+                if (t % 2 == 1)
+                    s[j] = 1;
+                else
+                    s[j] = -1;
+
+                t >>= 1;
+            }
+
+            long residue = residue(s, values, false);
+
+            if (residue < bestResidue)
+                bestResidue = residue;
         }
 
         return bestResidue;

@@ -42,6 +42,36 @@ public class Driver {
     }
 
     public static void main(String[] args) throws Exception {
+        if (args.length == 1 && Integer.parseInt(args[0]) == 1) {
+            int trials = 100;
+            long[] bbResults = new long[2];
+            for (int i = 0; i < trials; i++) {
+                final long[] test = new long[100];
+
+                for (int j = 0; j < 100; j++) {
+                    test[j] = ThreadLocalRandom.current().nextLong(1, 1000000000001L);
+                }
+
+                bbResults = add(bbResults, testFunction(new Callable<Long>() {
+                    public Long call() {
+                        long best = Long.MAX_VALUE;
+
+                        for (int o = 0; o < 100; o++) {
+                            long result = KarmarkarKarp.bubbleSearch(test);
+
+                            if (result < best)
+                                best = result;
+                        }
+
+                        return best;
+                    }
+                }));
+            }
+
+            System.out.format("%15s %15f\n", "Avg. time (ms)", (float) bbResults[0] / trials / 1000000);
+            System.out.format("%15s %15d\n", "Avg. residue", bbResults[1] / trials);
+            return;
+        }
         if (args.length == 1) {
             FileReader file = null;
             try {

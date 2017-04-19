@@ -100,4 +100,8 @@ public class Heap {
             n = parent(n);
         }
     }
+
+    int size() {
+        return heap.size();
+    }
 }
