@@ -100,15 +100,15 @@ class KarmarkarKarp {
     static long random(long[] a, boolean pp) {
         int n = a.length;
 
-        int[] s = randomSolution(n, pp);
-        long sResidue = residue(s, a, pp);
+        // int[] s = randomSolution(n, pp);
+        long sResidue = residue(randomSolution(n, pp), a, pp);
 
         for (int j = 0; j < MAX_ITERS; j++) {
             int[] sPrime = randomSolution(n, pp);
             long sPrimeResidue = residue(sPrime, a, pp);
 
             if (sPrimeResidue < sResidue) {
-                s = sPrime;
+                // s = sPrime;
                 sResidue = sPrimeResidue;
             }
         }

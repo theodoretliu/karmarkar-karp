@@ -1,3 +1,5 @@
+.PHONY: all kk clean
+
 all: kk
 
 kk: Driver.java
